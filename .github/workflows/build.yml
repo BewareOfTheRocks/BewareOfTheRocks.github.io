@@ -1,0 +1,66 @@
+name: PR Install and Run
+
+on:
+  pull_request:
+
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-frontend:
+    name: Start dev, build, and smoke test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nasa-space-apps
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nasa-space-apps/package-lock.json
+
+      - name: Install dependencies (prefer ci, fallback to install)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci || npm install
+          else
+            npm install
+          fi
+
+      - name: Start CRA dev server (background)
+        env:
+          BROWSER: none
+          CI: true
+          PORT: 3000
+        run: |
+          npm start > dev.log 2>&1 &
+          echo $! > .dev_pid
+          timeout 60 bash -c 'until curl -sSf http://localhost:3000 > /dev/null; do sleep 1; done'
+
+      - name: Smoke test dev server
+        run: |
+          curl -sS http://localhost:3000 | grep -qi 'id="root"'
+
+      - name: Print dev server log on failure
+        if: failure()
+        run: |
+          echo "---- dev.log ----"
+          sed -n '1,200p' dev.log || true
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f .dev_pid ]; then kill $(cat .dev_pid) || true; fi
+
+      - name: Stop servers
+        if: always()
+        run: |
+          if [ -f .serve_pid ]; then kill $(cat .serve_pid) || true; fi
+          if [ -f .dev_pid ]; then kill $(cat .dev_pid) || true; fi
