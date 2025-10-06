@@ -19,13 +19,13 @@ export default function TerminalLanding() {
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
   const [canClick, setCanClick] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [preloadedAssets, setPreloadedAssets] = useState({});
+  // const [loadingProgress, setLoadingProgress] = useState(0);
+  // const [preloadedAssets, setPreloadedAssets] = useState({});
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [terminalSound, setTerminalSound] = useState(null);
   const navigate = useNavigate();
 
-  const fullText = currentText;
+  // const fullText = currentText;
 
   // Initialize audio context manager
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function TerminalLanding() {
       loadedItems++;
       const progress = (loadedItems / totalItems) * 100;
       console.log(`Loading progress: ${progress}% (${loadedItems}/${totalItems})`);
-      setLoadingProgress(progress);
+      // setLoadingProgress(progress);
     };
 
     loadingManager.onLoad = () => {
@@ -161,7 +161,7 @@ export default function TerminalLanding() {
               updateProgress(); // Continue even if background init fails
             });
           
-          setPreloadedAssets(loadedAssets);
+          // setPreloadedAssets(loadedAssets);
           setAssetsLoaded(true);
           
           // Store everything globally
@@ -211,7 +211,7 @@ export default function TerminalLanding() {
         if (material.dispose) material.dispose();
       });
     };
-  }, []);
+  }, [createMeteorGeometry]);
 
   // Terminal typing effect
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const width = window.innerWidth;
-const height = window.innerHeight;
+// const height = window.innerHeight;
 
 const BALL_SIZE = width * 0.04; // Tamanho da bola (metade do anterior)
 const NUM_BALLS = 3;
@@ -28,6 +28,9 @@ function randomEdgePosition() {
       x = window.innerWidth - BALL_SIZE;
       y = Math.random() * (window.innerHeight - BALL_SIZE);
       break;
+    default:
+      x = window.innerWidth - BALL_SIZE;
+      y = Math.random() * (window.innerHeight - BALL_SIZE);
   }
 
   // Velocidade inicial apontando para dentro
