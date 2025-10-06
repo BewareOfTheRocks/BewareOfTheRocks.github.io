@@ -125,7 +125,7 @@ export class ThreeInitializer {
             if (preprocessedObjects.galaxyGeometry && preprocessedObjects.galaxyMaterial) {
                 galaxy = new THREE.Mesh(preprocessedObjects.galaxyGeometry, preprocessedObjects.galaxyMaterial);
             } else {
-                galaxy = new Galaxy(500, 64, preloadedAssets).mesh;
+                galaxy = new Galaxy(64, preloadedAssets).mesh;
             }
             scene.add(galaxy);
 

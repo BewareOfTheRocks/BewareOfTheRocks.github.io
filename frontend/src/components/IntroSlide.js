@@ -90,6 +90,23 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       return meteors;
     };
 
+    // Asteroid orbit preloading logic (mirroring ThreeInitializer)
+    let cachedAsteroidOrbits = null;
+    async function loadAsteroidOrbits() {
+      if (cachedAsteroidOrbits && cachedAsteroidOrbits.length > 0) {
+        return cachedAsteroidOrbits;
+      }
+      try {
+        const data = window.preloadedAsteroidData || await fetch('/Near-Earth.json').then(r => r.json());
+        cachedAsteroidOrbits = parseOrbitFile(data);
+        return cachedAsteroidOrbits;
+      } catch (err) {
+        console.error('Failed to load Near-Earth.json:', err);
+        cachedAsteroidOrbits = [];
+        return [];
+      }
+    }
+
     const initBackground = async () => {
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 20000);
@@ -107,7 +124,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       if (preprocessedObjects.galaxyGeometry && preprocessedObjects.galaxyMaterial) {
         galaxy = new THREE.Mesh(preprocessedObjects.galaxyGeometry, preprocessedObjects.galaxyMaterial);
       } else {
-        const galaxyInstance = new Galaxy(10000, 64, preloadedAssets);
+        const galaxyInstance = new Galaxy(64, preloadedAssets);
         galaxy = galaxyInstance.mesh;
       }
       galaxy.position.set(0, 0, 0);
@@ -117,15 +134,8 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       scene.add(ambientLight);
       sun.addCorona();
 
-      // Load asteroid orbits
-      try {
-        const response = await fetch('/Near-Earth.json');
-        const data = await response.json();
-        asteroidOrbits = parseOrbitFile(data);
-      } catch (error) {
-        console.error('Failed to load asteroid data:', error);
-        asteroidOrbits = [];
-      }
+      // Load asteroid orbits (preloaded and cached)
+      asteroidOrbits = await loadAsteroidOrbits();
 
       // Set up camera controller
       const earthPos = earth.getPosition();
