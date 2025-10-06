@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/nav.css';
 
-export default function MitigationIntroSlide() {
+export default function OrbitalSimulationIntroSlide() {
   return (
     <div style={{
       minHeight: '100vh',
@@ -30,7 +30,7 @@ export default function MitigationIntroSlide() {
           margin: 0,
           textShadow: '0 0 24px rgba(0, 255, 200, 0.15), 0 0 8px rgba(255,255,255,0.15)'
         }}>
-          How to mitigate those risks?
+          Here you write your title
         </h1>
         <p style={{
           margin: 0,
@@ -39,13 +39,13 @@ export default function MitigationIntroSlide() {
           lineHeight: 1.6,
           textShadow: '0 0 10px rgba(0,0,0,0.35)'
         }}>
-          After understanding what could cause harm to planet Earth, what is already being done to prevent that from happening?
+          É um fato conhecido de todos que um leitor se distrairá com o conteúdo de texto legível de uma página quando estiver examinando sua diagramação. A vantagem de usar Lorem Ipsum é que ele tem uma distribuição normal de letras, ao contrário de "Conteúdo aqui, conteúdo aqui", fazendo com que ele tenha uma aparência similar a de um texto legível. Muitos softwares de publicação e editores de páginas na internet agora usam Lorem Ipsum como texto-modelo padrão, e uma rápida busca por 'lorem ipsum' mostra vários websites ainda em sua fase de construção. Várias versões novas surgiram ao longo dos anos, eventualmente por acidente, e às vezes de propósito (injetando humor, e coisas do gênero).
         </p>
       </div>
 
       {/* Nav arrows consistent with other slides */}
-      <Link to="/meteor-impact-simulator" className="sb-nav__btn left" aria-label="Back">‹</Link>
-      <Link to="/blueprint" className="sb-nav__btn right" aria-label="Next">›</Link>
+      <Link to="/home" className="sb-nav__btn left" aria-label="Back">‹</Link>
+      <Link to="/intro" className="sb-nav__btn right" aria-label="Next">›</Link>
     </div>
   );
 }

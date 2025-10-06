@@ -28,7 +28,7 @@ export default function Credits() {
     {
       key: 'thanks',
       title: 'Thank you!',
-      body: `Thank you for experiencing our space adventure.\n\nThis project was submitted on NASA Space Apps Challenge 2025, under the challenge Meteor Madness.\n\nIt has come to reality by the skills and dreams of UNICAMP undergraduate students\n Ainaras Marão\n Bruno Jambeiro\n Matheus Veiga\n Rafael Carro\n Nicholas Pucharelli\n Yan Oliveira`,
+      body: `Thank you for experiencing our space adventure.\n\nThis project was submitted on NASA Space Apps Challenge 2025, under the challenge Meteor Madness.\n\nIt has come to reality by the skills and dreams of UNICAMP undergraduate students\n Ainaras Marão\n Bruno Jambeiro\n Matheus Veiga\n Nicholas Pucharelli\n Rafael Carro\n Yan Oliveira`,
     }
   ];
 
