@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import * as THREE from 'three';
 import { Earth } from './render/Earth';
@@ -26,7 +26,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
   const preprocessedObjects = window.preprocessedObjects || {};
   const assetsPreloaded = sessionStorage.getItem('assetsPreloaded') === 'true';
 
-  const [setMeteorsList] = useState([]);
+  const [meteorsList, setMeteorsList] = useState([]);
   const [asteroidOrbits, setAsteroidOrbits] = useState([]);
   const [sceneReady, setSceneReady] = useState(false);
   const [currentScene, setCurrentScene] = useState(null);
@@ -34,7 +34,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
   const [currentCamera, setCurrentCamera] = useState(null); // Add camera state to store camera reference
 
   // Function to create meteors from asteroid orbits
-  const createMeteorsFromOrbits = (orbits, scene, sun, assets, preprocessed, camera) => {
+  const createMeteorsFromOrbits = useCallback((orbits, scene, sun, assets, preprocessed, camera) => {
     if (!orbits.length || !scene || !sun) return [];
 
     console.log(`Creating ${orbits.length} meteors from asteroid orbits`);
@@ -75,7 +75,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
 
     console.log(`Successfully created ${meteors.length} meteors`);
     return meteors;
-  };
+  }, []); // useCallback dependencies - empty since the function doesn't depend on any props/state
 
   // Effect to create meteors when we have both orbits and scene ready
   useEffect(() => {
@@ -103,7 +103,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
       // Pass meteors list to camera controller for asteroid locking
 
     }
-  }, [loadMeteors, asteroidOrbits, sceneReady, currentScene, sunInstance, currentCamera]);
+  }, [loadMeteors, asteroidOrbits, sceneReady, currentScene, sunInstance, currentCamera, preloadedAssets, preprocessedObjects, createMeteorsFromOrbits]);
 
   useEffect(() => {
     // Only load asteroid data if meteors should be loaded
