@@ -7,7 +7,6 @@ import { Galaxy } from '../render/Galaxy';
 import { CameraController } from '../controller/CameraController';
 import { Sun } from '../render/Sun';
 import { Meteor } from '../render/Meteor';
-import { ThreeInitializer } from '../utils/ThreeInitializer';
 import { parseOrbitFile } from '../utils/NasaJsonParser.js';
 import musicManager from '../utils/MusicManager';
 import audioContextManager from '../utils/AudioContextManager';
@@ -35,6 +34,9 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
   useEffect(() => {
     if (!backgroundRef.current) return;
 
+    // Capture the ref value to use in cleanup
+    const backgroundElement = backgroundRef.current;
+
     // Get preloaded assets
     const preloadedAssets = window.preloadedAssets || {};
     const preprocessedObjects = window.preprocessedObjects || {};
@@ -56,7 +58,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setClearColor(0x000000, 1);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      backgroundRef.current.appendChild(renderer.domElement);
+      backgroundElement.appendChild(renderer.domElement);
 
       // Create scene objects
       sun = new Sun(scene, 15, preloadedAssets, preprocessedObjects);
@@ -199,8 +201,8 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       if (renderer) {
         renderer.dispose();
       }
-      if (backgroundRef.current && renderer && renderer.domElement.parentNode === backgroundRef.current) {
-        backgroundRef.current.removeChild(renderer.domElement);
+      if (backgroundElement && renderer && renderer.domElement.parentNode === backgroundElement) {
+        backgroundElement.removeChild(renderer.domElement);
       }
     };
   }, []);
