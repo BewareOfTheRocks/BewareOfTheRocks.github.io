@@ -43,6 +43,7 @@ export class CameraController {
         
         // Meteors list for asteroid locking
         this.meteorsList = [];
+        this.currentMeteorIndex = -1; // Track current meteor index
 
         this.update();
     }
@@ -191,6 +192,18 @@ export class CameraController {
                 this.spherical.radius = this.currentDistance;
                 this.update();
                 break;
+            case 'ArrowRight':
+                // Go to next meteor
+                if (this.meteorsList.length > 0 && this.currentMeteorIndex < this.meteorsList.length - 1) {
+                    this.lockOntoMeteorByIndex(this.currentMeteorIndex + 1);
+                }
+                break;
+            case 'ArrowLeft':
+                // Go to previous meteor
+                if (this.meteorsList.length > 0 && this.currentMeteorIndex > 0) {
+                    this.lockOntoMeteorByIndex(this.currentMeteorIndex - 1);
+                }
+                break;
         }
     }
     
@@ -294,13 +307,18 @@ export class CameraController {
     
     // Set current meteor for locking (called when meteor is created/destroyed)
     setCurrentMeteor(meteorInstance) {
-        console.log('Current meteor set:', meteorInstance);
+        // Find index in meteorsList
+        const idx = this.meteorsList.indexOf(meteorInstance);
+        if (idx !== -1) {
+            this.currentMeteorIndex = idx;
+        }
         this.currentMeteor = meteorInstance;
     }
     
     // Set meteors list for asteroid locking
     setMeteorsList(meteorsList) {
         this.meteorsList = meteorsList;
+        this.currentMeteorIndex = meteorsList.length > 0 ? 0 : -1;
     }
 
     // Internal method to lock onto meteor if one exists
@@ -365,20 +383,18 @@ export class CameraController {
     // Lock onto meteor with smooth transition
     lockOntoMeteor(meteorInstance, duration = 1500) {
         if (!meteorInstance) return;
-        
         // Don't transition if already locked onto this meteor
         if (this.lockMode === 'meteor' && this.lockedTarget === meteorInstance) return;
-        
+        // Instantiate mesh when locking onto meteor
+        if (meteorInstance.instantiateMesh) meteorInstance.instantiateMesh();
         // Temporarily unlock current target to prevent interference
         const previousTarget = this.lockedTarget;
         const previousMode = this.lockMode;
         this.lockedTarget = null;
         this.lockMode = 'none';
-        
         // Set dynamic minimum distance for meteor (variable radius ~0.2)
         const meteorRadius = meteorInstance.radius || 0.2;
         const targetDistance = meteorRadius * 4; // Start at 4x radius for good view
-        
         this.transitionToTarget(meteorInstance, targetDistance, () => {
             this.lockedTarget = meteorInstance;
             this.lockMode = 'meteor';
@@ -386,7 +402,17 @@ export class CameraController {
             console.log('Camera locked onto Meteor');
         }, duration);
     }
-    
+
+    // Lock onto meteor by index in the meteorsList
+    lockOntoMeteorByIndex(index, duration = 1500) {
+        if (!this.meteorsList || this.meteorsList.length === 0) return;
+        if (index < 0 || index >= this.meteorsList.length) return;
+        this.currentMeteorIndex = index;
+        const meteor = this.meteorsList[index];
+        this.setCurrentMeteor(meteor);
+        this.lockOntoMeteor(meteor, duration);
+    }
+
     // Generic smooth transition to a target
     transitionToTarget(targetObject, targetDistance, onComplete, duration = 1500) {
         this.isTransitioning = true;
@@ -444,6 +470,10 @@ export class CameraController {
     
     // Unlock from current target
     unlockTarget() {
+        // Remove mesh if unlocking from meteor
+        if (this.lockedTarget && this.lockMode === 'meteor' && this.lockedTarget.removeMesh) {
+            this.lockedTarget.removeMesh();
+        }
         this.lockedTarget = null;
         this.lockMode = 'none';
         this.isTransitioning = false; // Allow immediate control after unlock

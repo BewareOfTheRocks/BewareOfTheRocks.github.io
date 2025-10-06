@@ -6,12 +6,24 @@ export class Meteor extends AstralObject {
     constructor(scene, radius, segments = 32, initialPosition, preloadedAssets = {}, preprocessedObjects = {}) {
         super(scene, radius, segments, initialPosition, preprocessedObjects);
         this.preloadedAssets = preloadedAssets;
-
-        this.mesh = this.createMeteorMesh();
-        this.setPosition(this.position.x, this.position.y, this.position.z);
+        this.mesh = null; // Mesh is not created by default
 
         // Add to scene (traceLine is already added by parent constructor)
         this.addToScene();
+    }
+
+    instantiateMesh() {
+        if (this.mesh) return; // Already instantiated
+        this.mesh = this.createMeteorMesh();
+        this.setPosition(this.position.x, this.position.y, this.position.z);
+        this.addToScene();
+    }
+
+    removeMesh() {
+        if (this.mesh) {
+            this.removeFromScene();
+            this.mesh = null;
+        }
     }
 
     createMeteorMesh() {
