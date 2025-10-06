@@ -148,8 +148,8 @@ export default function BlueprintPage({ wallpaperUrl }) {
     if (animating) return;
     // If we're on the last page, play a page-level fade-out then navigate
     if (index === SUBPAGES.length - 1) {
-      setAnimating(true);
-      setPageExit(true);
+      // setAnimating(true);
+      // setPageExit(true);
       // match CSS animation duration (800ms) with small buffer
       pageExitRef.current = setTimeout(() => {
         navigate('/ending');
