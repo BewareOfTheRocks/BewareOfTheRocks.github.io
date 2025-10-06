@@ -36,7 +36,7 @@ export default function App() {
         <Route path="/types-of-space-bodies" element={<TypesOfSpaceBodiesSlide />} />
         <Route path="/cards" element={<DraggableCards />} />
         <Route path="/meteor-impact-simulator" element={<MeteorImpactSimulator />} />
-        <Route path="/ending" element={<TerminalLanding texts={['End of training. You are now fully prepared to protect planet Earth. Congratulations.\n\nClick to finish routine.']} path={'/credits'} />} />
+        <Route path="/ending" element={<TerminalLanding texts={['End of training. You are now fully prepared to protect planet Earth. Congratulations!\n\nClick to finish routine.']} path={'/credits'} />} />
         <Route path="/meteor-impact-intro" element={<MeteorImpactSimulationIntroSlide />} />
         <Route path="/orbital-simulation-intro" element={<OrbitalSimulationIntroSlide />} />
 
