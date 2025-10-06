@@ -7,7 +7,6 @@ import { Galaxy } from '../render/Galaxy';
 import { CameraController } from '../controller/CameraController';
 import { Sun } from '../render/Sun';
 import { Meteor } from '../render/Meteor';
-import { ThreeInitializer } from '../utils/ThreeInitializer';
 import { parseOrbitFile } from '../utils/NasaJsonParser.js';
 import musicManager from '../utils/MusicManager';
 import audioContextManager from '../utils/AudioContextManager';

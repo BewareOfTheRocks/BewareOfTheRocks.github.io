@@ -32,7 +32,7 @@ export default function Credits() {
     }
   ];
 
-  const [index, setIndex] = useState(0);
+  const [index] = useState(0);
   const [anim, setAnim] = useState('in');
   const mountRef = useRef(null);
   const rendererRef = useRef(null);
