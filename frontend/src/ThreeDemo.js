@@ -7,7 +7,6 @@ import { CameraController } from './controller/CameraController';
 import { Sun } from './render/Sun';
 import { Meteor } from './render/Meteor';
 import { ThreeInitializer } from './utils/ThreeInitializer';
-import Stats from 'stats.js';
 import musicManager from './utils/MusicManager';
 import audioContextManager from './utils/AudioContextManager';
 import { createOrbitFromJPLData, parseOrbitFile} from './utils/NasaJsonParser.js';
@@ -16,7 +15,6 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
     const location = useLocation();
     const navigate = useNavigate();
     const mountRef = useRef(null);
-    const statsContainerRef = useRef(null);
     const meteorsListRef = useRef([]); // Use ref for meteors list to access in animation loops
 
     // Check for loadMeteors flag from navigation state, fallback to prop, then default true
@@ -95,12 +93,6 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
         // AsteroidOrbits is an array of orbit parameter objects
         // let meteorsList = [];
 
-
-        const stats = new Stats();
-        stats.showPanel(0);
-        if (statsContainerRef.current) {
-            statsContainerRef.current.appendChild(stats.dom);
-        }
 
         if (!mountRef.current) return;
 
@@ -261,7 +253,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
             }
 
             const animate = (currentTimestamp) => {
-                stats.begin();
+                // stats.begin();
                 const deltaTime = (currentTimestamp - lastTimestamp) / 1000;
                 lastTimestamp = currentTimestamp;
                 const absoluteTime = (currentTimestamp - startTimestamp) / 1000;
@@ -287,7 +279,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
 
 
                 renderer.render(scene, camera);
-                stats.end();
+                // stats.end();
                 animationId = requestAnimationFrame(animate);
             };
 
@@ -310,9 +302,9 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
                 if (earthInstance) earthInstance.dispose();
                 renderer.dispose();
                 // Remove stats panel from container
-                if (statsContainerRef.current && stats.dom.parentNode === statsContainerRef.current) {
-                    statsContainerRef.current.removeChild(stats.dom);
-                }
+                // if (statsContainerRef.current && stats.dom.parentNode === statsContainerRef.current) {
+                //     statsContainerRef.current.removeChild(stats.dom);
+                // }
                 if (mountRef.current) mountRef.current.innerHTML = '';
             };
         }
@@ -327,9 +319,9 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
                 window.threeCleanup = null;
             }
             // Remove stats panel from container (fallback cleanup)
-            if (statsContainerRef.current && stats.dom.parentNode === statsContainerRef.current) {
-                statsContainerRef.current.removeChild(stats.dom);
-            }
+            // if (statsContainerRef.current && stats.dom.parentNode === statsContainerRef.current) {
+            //     statsContainerRef.current.removeChild(stats.dom);
+            // }
         };
     }, []);
 
@@ -419,7 +411,6 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
                 >← Back to Home</button>
             </div>
             <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
-            <div ref={statsContainerRef} style={{ position: 'absolute', top: 0, left: 0, zIndex: 200 }} />
         </div>
     );
 }

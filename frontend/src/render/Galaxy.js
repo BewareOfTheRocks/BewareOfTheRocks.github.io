@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 export class Galaxy {
     constructor(segments = 64, preloadedAssets = {}) {
-        this.radius = 10000.0;
+        this.radius = 15000.0;
         this.segments = segments;
         this.preloadedAssets = preloadedAssets;
         this.mesh = this.createGalaxyMesh(this.radius, segments);

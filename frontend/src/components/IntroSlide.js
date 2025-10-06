@@ -12,7 +12,7 @@ import audioContextManager from '../utils/AudioContextManager';
 import '../styles/nav.css';
 
 export default function IntroSlide({ topLeft = 'First, calm down. There\'s no need to worry! For now, at least. Every year, several PHAs (Potentially Hazardous Asteroids) and NEOs (Near-Earth Objects) are detected by state-of-the-art technology.',
-   bottomRight = 'In this simulation you can visualize the real meteors that are travelling around Earth. These meteors you see were provided by Nasa telescopes, you can also see in perspective the size of the meteors and their trajectories.' }) {
+   bottomRight = 'In this simulation you can visualize the real meteors that are travelling around Earth. These meteors you see were provided by Nasa Near-Earth Comets. Press A to lock in an Asteroid and use your left and right arrow to move around' }) {
   const backgroundRef = useRef(null);
   const [lockedMeteorName, setLockedMeteorName] = useState('');
   const cameraControllerRef = useRef(null);
