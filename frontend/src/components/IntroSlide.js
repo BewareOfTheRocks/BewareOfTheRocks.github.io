@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { Earth } from '../render/Earth';
 import { Galaxy } from '../render/Galaxy';
@@ -14,6 +13,8 @@ import '../styles/nav.css';
 
 export default function IntroSlide({ topLeft = 'First, calm down. There\'s no need to worry! For now, at least. Every year, several PHAs (Potentially Hazardous Asteroids) and NEOs (Near-Earth Objects) are detected by state-of-the-art technology.', bottomRight = 'Here on Earth, we like to be overly cautious. An asteroid or comet is considered "near" when it approaches our planet less than 1.3 times the distance from Earth to Sun. Thus, most of them aren\'t really a danger.' }) {
   const backgroundRef = useRef(null);
+  const [lockedMeteorName, setLockedMeteorName] = useState('');
+  const cameraControllerRef = useRef(null);
 
   // Start music when component mounts
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
     const preprocessedObjects = window.preprocessedObjects || {};
     let scene, camera, renderer, animationId;
     let meteors = [];
-    let earth, sun, cameraController;
+    let earth, sun;
     let asteroidOrbits = [];
     let sceneReady = false;
     let currentCamera = null;
@@ -72,7 +73,8 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
               METEOR_SEGMENTS,
               position,
               assets,
-              preprocessed
+              preprocessed,
+              orbits[index].name // Pass asteroid name
             );
             meteor.setCamera(camera);
             meteor.startOrbit(sun.getPosition(), 0.001 + Math.random() * 0.002);
@@ -142,7 +144,9 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       const cameraDistance = 3;
       camera.position.set(earthPos.x, earthPos.y, earthPos.z + cameraDistance);
       camera.lookAt(earthPos);
+      let cameraController; // Local variable for setup
       cameraController = new CameraController(camera, earthPos, 2, 20);
+      cameraControllerRef.current = cameraController; // Store in ref for global access
       cameraController.enableControls(renderer.domElement);
       cameraController.setZoomLimits(2, 20);
       cameraController.setTargetObjects(sun, earth);
@@ -212,6 +216,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
     return () => {
       window.removeEventListener('resize', handleResize);
       if (animationId) cancelAnimationFrame(animationId);
+      const cameraController = cameraControllerRef.current;
       if (cameraController) {
         cameraController.disableControls(renderer.domElement);
       }
@@ -222,6 +227,40 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
         backgroundElement.removeChild(renderer.domElement);
       }
     };
+  }, []);
+
+  useEffect(() => {
+    let lastLockedMeteor = null;
+    function pollLockedMeteor() {
+      const cameraController = cameraControllerRef.current;
+      if (cameraController) {
+        // Debug: print lockMode and lockedTarget
+        // eslint-disable-next-line
+        console.log('LockMode:', cameraController.lockMode, 'LockedTarget:', cameraController.lockedTarget);
+      }
+      if (cameraController && cameraController.lockMode === 'meteor' && cameraController.lockedTarget) {
+        let meteorName = '';
+        if (cameraController.lockedTarget.getName) {
+          meteorName = cameraController.lockedTarget.getName();
+        } else if (cameraController.lockedTarget.name) {
+          meteorName = cameraController.lockedTarget.name;
+        } else {
+          meteorName = 'Unknown';
+        }
+        // Debug: print meteor name
+        // eslint-disable-next-line
+        console.log('Locked Meteor Name:', meteorName);
+        if (meteorName !== lastLockedMeteor) {
+          setLockedMeteorName(meteorName);
+          lastLockedMeteor = meteorName;
+        }
+      } else if (lockedMeteorName !== '') {
+        setLockedMeteorName('');
+        lastLockedMeteor = null;
+      }
+      requestAnimationFrame(pollLockedMeteor);
+    }
+    pollLockedMeteor();
   }, []);
 
   return (
@@ -288,6 +327,27 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       }}>
         {bottomRight}
       </div>
+
+      {/* Meteor name overlay */}
+      {lockedMeteorName && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -120px)',
+          background: 'rgba(0,0,0,0.7)',
+          color: '#fff',
+          padding: '16px 32px',
+          borderRadius: '12px',
+          fontSize: '2rem',
+          fontWeight: 'bold',
+          zIndex: 100,
+          boxShadow: '0 2px 16px rgba(0,0,0,0.3)',
+          pointerEvents: 'none',
+        }}>
+          {lockedMeteorName}
+        </div>
+      )}
 
       {/* SpaceBodies-like nav arrows */}
       <Link to="/orbital-simulation-intro" className="sb-nav__btn left" aria-label="Back">‹</Link>
