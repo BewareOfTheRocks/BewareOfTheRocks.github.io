@@ -34,41 +34,76 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
 
   useEffect(() => {
     if (!backgroundRef.current) return;
-
-    // Capture the ref value to use in cleanup
     const backgroundElement = backgroundRef.current;
-
-    // Get preloaded assets
     const preloadedAssets = window.preloadedAssets || {};
     const preprocessedObjects = window.preprocessedObjects || {};
-
     let scene, camera, renderer, animationId;
     let meteors = [];
     let earth, sun, cameraController;
+    let asteroidOrbits = [];
+    let sceneReady = false;
+    let currentCamera = null;
+    let currentScene = null;
+    let sunInstance = null;
+    let meteorsListRef = { current: [] };
+
+    // Configurable options for meteor creation
+    const METEOR_BATCH_SIZE = 10;
+    const METEOR_SEGMENTS = 12;
+    const MAX_METEORS = 200;
+
+    // Progressive meteor creation logic
+    const createMeteorsFromOrbitsProgressive = (orbits, scene, sun, assets, preprocessed, camera, batchSize = METEOR_BATCH_SIZE, onBatchCreated) => {
+      if (!orbits.length || !scene || !sun) return [];
+      const meteors = [];
+      let index = 0;
+      const total = Math.min(orbits.length, MAX_METEORS);
+      function createBatch() {
+        const end = Math.min(index + batchSize, total);
+        for (; index < end; index++) {
+          try {
+            const position = new THREE.Vector3(
+              orbits[index].semiMajorAxis * Math.cos(orbits[index].omega),
+              0,
+              orbits[index].semiMajorAxis * Math.sin(orbits[index].omega)
+            );
+            const meteor = new Meteor(
+              scene,
+              0.05 + Math.random() * 0.1,
+              METEOR_SEGMENTS,
+              position,
+              assets,
+              preprocessed
+            );
+            meteor.setCamera(camera);
+            meteor.startOrbit(sun.getPosition(), 0.001 + Math.random() * 0.002);
+            meteors.push(meteor);
+          } catch (error) {
+            console.error(`Failed to create meteor ${index + 1}:`, error);
+          }
+        }
+        if (onBatchCreated) onBatchCreated(meteors);
+        if (index < total) {
+          setTimeout(createBatch, 16);
+        }
+      }
+      createBatch();
+      return meteors;
+    };
 
     const initBackground = async () => {
-      // Create scene
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 20000);
-      renderer = new THREE.WebGLRenderer({ 
-        antialias: true, 
-        alpha: true,
-        powerPreference: "high-performance"
-      });
-
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setClearColor(0x000000, 1);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       backgroundElement.appendChild(renderer.domElement);
 
-      // Create scene objects
       sun = new Sun(scene, 15, preloadedAssets, preprocessedObjects);
       sun.setPosition(0, 0, 0);
-
       earth = new Earth(scene, 1, 16, new THREE.Vector3(150, 0, 0), preloadedAssets, preprocessedObjects);
       earth.startOrbit();
-
-      // Add galaxy
       let galaxy;
       if (preprocessedObjects.galaxyGeometry && preprocessedObjects.galaxyMaterial) {
         galaxy = new THREE.Mesh(preprocessedObjects.galaxyGeometry, preprocessedObjects.galaxyMaterial);
@@ -79,106 +114,78 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       galaxy.position.set(0, 0, 0);
       galaxy.renderOrder = -1000;
       scene.add(galaxy);
-
-      // Add lighting
       const ambientLight = new THREE.AmbientLight(0x404040, 0.1);
       scene.add(ambientLight);
       sun.addCorona();
 
-      // Load meteors
+      // Load asteroid orbits
       try {
         const response = await fetch('/Near-Earth.json');
         const data = await response.json();
-        const asteroidOrbits = parseOrbitFile(data);
-        
-        // Create meteors from first 7 asteroids
-        asteroidOrbits.slice(0, 7).forEach((orbitParams, index) => {
-          try {
-            const position = new THREE.Vector3(
-              orbitParams.semiMajorAxis * Math.cos(orbitParams.omega),
-              0,
-              orbitParams.semiMajorAxis * Math.sin(orbitParams.omega)
-            );
-
-            const meteor = new Meteor(
-              scene,
-              0.05 + Math.random() * 0.1,
-              32,
-              position,
-              preloadedAssets,
-              preprocessedObjects
-            );
-
-            meteor.setCamera(camera);
-            meteor.startOrbit(sun.getPosition(), 0.001 + Math.random() * 0.002);
-            meteors.push(meteor);
-          } catch (error) {
-            console.error(`Failed to create meteor ${index}:`, error);
-          }
-        });
+        asteroidOrbits = parseOrbitFile(data);
       } catch (error) {
         console.error('Failed to load asteroid data:', error);
+        asteroidOrbits = [];
       }
 
-      // Set camera position for nice view and setup camera controller
+      // Set up camera controller
       const earthPos = earth.getPosition();
       const cameraDistance = 3;
-
-      // Position camera relative to Earth
       camera.position.set(earthPos.x, earthPos.y, earthPos.z + cameraDistance);
       camera.lookAt(earthPos);
-
-      // Initialize camera controller with Earth's position as center
       cameraController = new CameraController(camera, earthPos, 2, 20);
       cameraController.enableControls(renderer.domElement);
       cameraController.setZoomLimits(2, 20);
       cameraController.setTargetObjects(sun, earth);
-
-      // Lock onto Earth immediately
       cameraController.target.copy(earthPos);
       cameraController.spherical.setFromVector3(camera.position.clone().sub(earthPos));
       cameraController.currentDistance = cameraDistance;
       cameraController.lockedTarget = earth;
       cameraController.lockMode = 'earth';
       cameraController.updateMinDistanceForTarget();
+      currentCamera = camera;
+      currentScene = scene;
+      sunInstance = sun;
+      sceneReady = true;
 
-      console.log('Earth position:', earthPos);
-      console.log('Camera position:', camera.position);
-      console.log('Camera distance:', cameraDistance);
+      // Progressive meteor creation
+      createMeteorsFromOrbitsProgressive(
+        asteroidOrbits,
+        scene,
+        sun,
+        preloadedAssets,
+        preprocessedObjects,
+        camera,
+        METEOR_BATCH_SIZE,
+        (createdMeteors) => {
+          meteors = createdMeteors;
+          meteorsListRef.current = createdMeteors;
+          if (createdMeteors.length > 0 && cameraController) {
+            cameraController.setMeteorsList(createdMeteors);
+          }
+        }
+      );
 
       // Animation loop
       const startTime = performance.now();
-
       const animate = (currentTime) => {
         const deltaTime = (currentTime - startTime) / 1000;
-
-        // Update camera controller
         cameraController.update();
-
-        // Update objects
         earth.updateOrbit(deltaTime);
         earth.rotate(0.5 * deltaTime / 1000);
         earth.updateMatrixWorld();
-
-        // Update sun direction based on current Earth position
         const sunDirection = sun.getPosition().clone().sub(earth.getPosition()).normalize();
         earth.updateSunDirection(sunDirection);
-
         sun.update();
-
-        // Update meteors
-        meteors.forEach(meteor => {
+        meteorsListRef.current.forEach(meteor => {
           meteor.updateOrbit(deltaTime);
           meteor.rotate(0.01);
         });
-
         renderer.render(scene, camera);
         animationId = requestAnimationFrame(animate);
       };
-
       animate(performance.now());
     };
-
     initBackground();
 
     // Handle resize

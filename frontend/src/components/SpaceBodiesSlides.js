@@ -88,25 +88,82 @@ export default function SpaceBodiesSlides() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.set(0, 0, 3);
+    camera.position.set(0, 0, 4); // Move camera back a bit more
     cameraRef.current = camera;
     sceneRef.current = scene;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0); // Transparent background
     rendererRef.current = renderer;
     mount.appendChild(renderer.domElement);
 
-    // Simple lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-    const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+    // Improved lighting for better visibility
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6)); // Increased ambient light
+    const dir = new THREE.DirectionalLight(0xffffff, 1.2); // Increased directional light
     dir.position.set(2, 2, 2);
     scene.add(dir);
+    
+    // Add a second light from the opposite side to reduce harsh shadows
+    const dir2 = new THREE.DirectionalLight(0xffffff, 0.4);
+    dir2.position.set(-2, -1, 2);
+    scene.add(dir2);
 
     // Create instances with different classes for proper representation
-    const asteroid = new Meteor(scene, 0.75, 32, new THREE.Vector3(0, 0, 0), {}, {});
-    const comet = new Comet(scene, 0.25, 32, new THREE.Vector3(0, 0, 0), {}, {});
-    const meteor = new Meteor(scene, 0.25, 32, new THREE.Vector3(0, 0, 0), {}, {});
+    // Get preloaded assets if available
+    const preloadedAssets = window.preloadedAssets || {};
+    const preprocessedObjects = window.preprocessedObjects || {};
+    
+    console.log('Creating space objects with assets:', Object.keys(preloadedAssets));
+    
+    const asteroid = new Meteor(scene, 0.75, 32, new THREE.Vector3(0, 0, 0), preloadedAssets, preprocessedObjects);
+    const comet = new Comet(scene, 0.25, 32, new THREE.Vector3(0, 0, 0), preloadedAssets, preprocessedObjects);
+    const meteor = new Meteor(scene, 0.25, 32, new THREE.Vector3(0, 0, 0), preloadedAssets, preprocessedObjects);
+
+    // Instantiate the meshes for Meteor objects (Comet creates its mesh automatically)
+    asteroid.instantiateMesh();
+    meteor.instantiateMesh();
+
+    // Debug: Check if objects were created properly
+    console.log('Asteroid mesh:', asteroid.mesh);
+    console.log('Comet mesh:', comet.mesh, 'tail:', comet.tail, 'coma:', comet.coma);
+    console.log('Meteor mesh:', meteor.mesh);
+    
+    // Ensure all objects are properly added to scene and positioned correctly
+    [asteroid, comet, meteor].forEach((obj, index) => {
+      if (obj.mesh) {
+        // Make sure the mesh is in the scene
+        if (obj.mesh.parent !== scene) {
+          scene.add(obj.mesh);
+        }
+        // Position slightly different to avoid z-fighting
+        obj.mesh.position.z = index * 0.01;
+        console.log(`Object ${index} position:`, obj.mesh.position);
+      }
+      
+      // Handle comet special components
+      if (obj.tail && obj.tail.parent !== scene) {
+        scene.add(obj.tail);
+      }
+      if (obj.coma && obj.coma.parent !== scene) {
+        scene.add(obj.coma);
+      }
+    });
+    
+    // Fallback: Create basic materials if objects don't have proper meshes
+    [asteroid, comet, meteor].forEach((obj, index) => {
+      if (!obj.mesh) {
+        console.warn(`Object ${index} missing mesh, creating fallback`);
+        const geometry = new THREE.SphereGeometry(index === 0 ? 0.75 : 0.25, 32, 32);
+        const material = new THREE.MeshStandardMaterial({ 
+          color: index === 0 ? 0x8B4513 : (index === 1 ? 0x87CEEB : 0x696969),
+          roughness: 0.8,
+          metalness: 0.2
+        });
+        obj.mesh = new THREE.Mesh(geometry, material);
+        scene.add(obj.mesh);
+      }
+    });
 
     // Set sun position for proper comet tail direction (pointing left for presentation)
     comet.setSunPosition(new THREE.Vector3(2, 0, 0)); // Sun to the right, tail points left
