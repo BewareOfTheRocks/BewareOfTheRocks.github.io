@@ -39,7 +39,7 @@ export default function OrbitalSimulationIntroSlide() {
           lineHeight: 1.6,
           textShadow: '0 0 10px rgba(0,0,0,0.35)'
         }}>
-          Here on Earth, we like to be overly cautious. An asteroid or comet is considered "near" when it approaches our planet less than 1.3 times the distance from Earth to Sun. Thus, most of them aren\'t really a danger.
+          Here on Earth, we like to be overly cautious. An asteroid or comet is considered "near" when it approaches our planet less than 1.3 times the distance from Earth to Sun. Thus, most of them aren't really a danger.
           </p>
       </div>
 

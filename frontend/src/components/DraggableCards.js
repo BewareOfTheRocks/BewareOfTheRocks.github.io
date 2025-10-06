@@ -171,7 +171,7 @@ export default function DraggableCards() {
         </header>
         <div className="cards__stage" ref={containerRef}>
           {/* Navigation arrows (centered vertically) */}
-          <Link to="/intro" className="sb-nav__btn left" aria-label="Back">‹</Link>
+          <Link to="/space-bodies" className="sb-nav__btn left" aria-label="Back">‹</Link>
           <Link to="/more-data" className="sb-nav__btn right" aria-label="Next">›</Link>
           {/* Scanner area on the right third */}
           <div className="scanner">
