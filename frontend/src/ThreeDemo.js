@@ -10,7 +10,7 @@ import { ThreeInitializer } from './utils/ThreeInitializer';
 import Stats from 'stats.js';
 import musicManager from './utils/MusicManager';
 import audioContextManager from './utils/AudioContextManager';
-import { createOrbitFromJPLData, parseOrbitFile} from './utils/NasaJsonParser.js';
+import { parseOrbitFile} from './utils/NasaJsonParser.js';
 
 function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
   const location = useLocation();
@@ -26,7 +26,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
   const preprocessedObjects = window.preprocessedObjects || {};
   const assetsPreloaded = sessionStorage.getItem('assetsPreloaded') === 'true';
 
-  const [meteorsList, setMeteorsList] = useState([]);
+  const [setMeteorsList] = useState([]);
   const [asteroidOrbits, setAsteroidOrbits] = useState([]);
   const [sceneReady, setSceneReady] = useState(false);
   const [currentScene, setCurrentScene] = useState(null);
@@ -182,7 +182,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
       mountRef.current.innerHTML = '';
 
       // Take ownership of the background scene
-      const { scene, camera, renderer, sunInstance: sun, earthInstance, galaxy, meteors, cameraController, ambientLight, startTimestamp } = backgroundScene;
+      const { scene, camera, renderer, sunInstance: sun, earthInstance, meteors, cameraController, startTimestamp } = backgroundScene;
 
       // Set scene and sun for meteor creation
       setCurrentScene(scene);

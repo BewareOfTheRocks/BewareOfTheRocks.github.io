@@ -199,9 +199,6 @@ export default function Credits() {
     if (meteor.mesh) meteor.mesh.visible = !showEarth;
   };
 
-  const prev = () => setIndex((i) => Math.max(0, i - 1));
-  const next = () => setIndex((i) => Math.min(pages.length - 1, i + 1));
-
   return (
     <div className="credits__root">
       <div className="credits__grid">
