@@ -464,8 +464,7 @@
             </div>
 
             <div class="divider"></div>
-            <div class="section-title">Actions</div>
-            <em id="selectHint" style="display:block;margin-bottom:6px;">💡 Click on the map to choose the target!</em>
+            <em id="selectHint" style="display:block;margin-bottom:6px;">Click on the map to choose the target!</em>
         </div>
     </div>
 
@@ -521,7 +520,8 @@
         <div class="divider"></div>
         <div class="section-title">Tsunami</div>
         <div class="rows" id="tsunami-section" style="display:none;">
-            <div class="row" id="row-tsunami"><span class="label">Initial wave size</span><span class="value" id="r-tsunamiWave">—</span></div>
+            <div class="row" id="row-tsunami"><span class="label">Initial wave size</span><span class="value"
+                    id="r-tsunamiWave">—</span></div>
         </div>
     </div>
 
@@ -542,7 +542,7 @@
             // Check if we came from a specific page via referrer or URL parameter
             const urlParams = new URLSearchParams(window.location.search);
             const fromParam = urlParams.get('from');
-            
+
             // Also check parent window URL if we're in an iframe
             let parentFromParam = null;
             try {
@@ -553,11 +553,11 @@
             } catch (e) {
                 // Cross-origin iframe access denied, ignore
             }
-            
+
             const referrer = document.referrer;
-            
+
             let returnUrl = '/meteor-impact-intro'; // Default fallback
-            
+
             console.log('Navigation debug:', {
                 fromParam,
                 parentFromParam,
@@ -565,7 +565,7 @@
                 currentUrl: window.location.href,
                 parentUrl: window.parent?.location?.href
             });
-            
+
             // Priority 1: Check URL parameter (current window)
             if (fromParam === 'home') {
                 returnUrl = '/home';
@@ -586,7 +586,7 @@
             }
             
             console.log(`Returning to: ${returnUrl} (from: ${fromParam || parentFromParam || 'referrer'}, referrer: ${referrer})`);
-            
+
             // Try to communicate with parent React application
             try {
                 if (window.parent && window.parent !== window) {
@@ -617,7 +617,7 @@
             // Check where we came from to determine next logical page
             const urlParams = new URLSearchParams(window.location.search);
             const fromParam = urlParams.get('from');
-            
+
             // Also check parent window URL if we're in an iframe
             let parentFromParam = null;
             try {
@@ -628,13 +628,11 @@
             } catch (e) {
                 // Cross-origin iframe access denied, ignore
             }
-            
+
             const referrer = document.referrer;
-            
+
             let nextUrl = '/mitigation'; // Default
-                        
             console.log(`Going to next: ${nextUrl} (from: ${fromParam || parentFromParam || 'referrer'})`);
-            
             // Try to communicate with parent React application
             try {
                 if (window.parent && window.parent !== window) {
@@ -701,7 +699,7 @@
         const labelBrightness = 1;
 
         // Crater
-        const craterModelUri = "./crater_with_cone.glb";
+        const craterModelUri = "./cratera_skin.glb";
 
         // === AUDIO AND VISUAL EFFECTS ===
 
@@ -838,6 +836,8 @@
                     sceneModePicker: false,
                     animation: false,
                     timeline: false,
+                    infoBox: false,
+                    selectionIndicator: false,
                 });
 
                 // Camada adicional de labels
@@ -1028,7 +1028,7 @@
         });
 
         // Função para simular o impacto do meteoro
-    async function simulateImpact() {
+        async function simulateImpact() {
             // Block simulation without selected target
             if (region.longitude == null || region.latitude == null) {
                 alert('Click on the map to choose the target first.');
@@ -1298,11 +1298,11 @@
             const centeredPosition = Cesium.Cartesian3.fromDegrees(
                 longitude,
                 latitude,
-                actualHeight - (depth * 6.7)
+                actualHeight - (depth * 3.8)
             );
 
             // Escala proporcional ao raio da cratera
-            const craterScale = radius * 25;
+            const craterScale = radius;
 
             craterModel = viewer.entities.add({
                 position: centeredPosition,
@@ -1310,8 +1310,7 @@
                     uri: craterModelUri,
                     scale: craterScale,
                     minimumPixelSize: 64,
-                    maximumScale: craterScale,
-                    color: Cesium.Color.BROWN // Mudado para marrom
+                    maximumScale: craterScale
                 }
             });
 
@@ -1336,7 +1335,11 @@
                 viewer.scene.globe.clippingPlanes = undefined;
             }
 
-            // Não remove o targetMarker para manter o alvo selecionado
+            // Remove o targetMarker (bolinha vermelha)
+            if (targetMarker) {
+                viewer.entities.remove(targetMarker);
+                targetMarker = null;
+            }
 
             // Se há alvo, volta para ele; caso contrário, mantém visão global
             if (region.longitude != null && region.latitude != null) {
