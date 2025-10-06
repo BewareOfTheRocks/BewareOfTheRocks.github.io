@@ -3,10 +3,11 @@ import { Orbit } from './Orbit.js';
 import { AstralObject } from './AstralObject.js';
 
 export class Meteor extends AstralObject {
-    constructor(scene, radius, segments = 32, initialPosition, preloadedAssets = {}, preprocessedObjects = {}) {
+    constructor(scene, radius, segments = 32, initialPosition, preloadedAssets = {}, preprocessedObjects = {}, name = 'Unknown') {
         super(scene, radius, segments, initialPosition, preprocessedObjects);
         this.preloadedAssets = preloadedAssets;
         this.mesh = null; // Mesh is not created by default
+        this.name = name;
 
         // Add to scene (traceLine is already added by parent constructor)
         this.addToScene();

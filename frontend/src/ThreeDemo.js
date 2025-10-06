@@ -176,7 +176,7 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
                 galaxy = new THREE.Mesh(preprocessedObjects.galaxyGeometry, preprocessedObjects.galaxyMaterial);
             } else {
                 console.log('Creating galaxy from scratch');
-                const galaxyInstance = new Galaxy(10000, 64, preloadedAssets);
+                const galaxyInstance = new Galaxy(64, preloadedAssets);
                 galaxy = galaxyInstance.mesh;
             }
 

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { Earth } from '../render/Earth';
 import { Galaxy } from '../render/Galaxy';
@@ -15,6 +14,8 @@ import '../styles/nav.css';
 export default function IntroSlide({ topLeft = 'First, calm down. There\'s no need to worry! For now, at least. Every year, several PHAs (Potentially Hazardous Asteroids) and NEOs (Near-Earth Objects) are detected by state-of-the-art technology.',
    bottomRight = 'In this simulation you can visualize the real meteors that are travelling around Earth. These meteors you see were provided by Nasa telescopes, you can also see in perspective the size of the meteors and their trajectories.' }) {
   const backgroundRef = useRef(null);
+  const [lockedMeteorName, setLockedMeteorName] = useState('');
+  const cameraControllerRef = useRef(null);
 
   // Start music when component mounts
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
     const preprocessedObjects = window.preprocessedObjects || {};
     let scene, camera, renderer, animationId;
     let meteors = [];
-    let earth, sun, cameraController;
+    let earth, sun;
     let asteroidOrbits = [];
     let sceneReady = false;
     let currentCamera = null;
@@ -73,7 +74,8 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
               METEOR_SEGMENTS,
               position,
               assets,
-              preprocessed
+              preprocessed,
+              orbits[index].name // Pass asteroid name
             );
             meteor.setCamera(camera);
             meteor.startOrbit(sun.getPosition(), 0.001 + Math.random() * 0.002);
@@ -90,6 +92,23 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       createBatch();
       return meteors;
     };
+
+    // Asteroid orbit preloading logic (mirroring ThreeInitializer)
+    let cachedAsteroidOrbits = null;
+    async function loadAsteroidOrbits() {
+      if (cachedAsteroidOrbits && cachedAsteroidOrbits.length > 0) {
+        return cachedAsteroidOrbits;
+      }
+      try {
+        const data = window.preloadedAsteroidData || await fetch('/Near-Earth.json').then(r => r.json());
+        cachedAsteroidOrbits = parseOrbitFile(data);
+        return cachedAsteroidOrbits;
+      } catch (err) {
+        console.error('Failed to load Near-Earth.json:', err);
+        cachedAsteroidOrbits = [];
+        return [];
+      }
+    }
 
     const initBackground = async () => {
       scene = new THREE.Scene();
@@ -108,7 +127,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       if (preprocessedObjects.galaxyGeometry && preprocessedObjects.galaxyMaterial) {
         galaxy = new THREE.Mesh(preprocessedObjects.galaxyGeometry, preprocessedObjects.galaxyMaterial);
       } else {
-        const galaxyInstance = new Galaxy(10000, 64, preloadedAssets);
+        const galaxyInstance = new Galaxy(64, preloadedAssets);
         galaxy = galaxyInstance.mesh;
       }
       galaxy.position.set(0, 0, 0);
@@ -118,22 +137,17 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       scene.add(ambientLight);
       sun.addCorona();
 
-      // Load asteroid orbits
-      try {
-        const response = await fetch('/Near-Earth.json');
-        const data = await response.json();
-        asteroidOrbits = parseOrbitFile(data);
-      } catch (error) {
-        console.error('Failed to load asteroid data:', error);
-        asteroidOrbits = [];
-      }
+      // Load asteroid orbits (preloaded and cached)
+      asteroidOrbits = await loadAsteroidOrbits();
 
       // Set up camera controller
       const earthPos = earth.getPosition();
       const cameraDistance = 3;
       camera.position.set(earthPos.x, earthPos.y, earthPos.z + cameraDistance);
       camera.lookAt(earthPos);
+      let cameraController; // Local variable for setup
       cameraController = new CameraController(camera, earthPos, 2, 20);
+      cameraControllerRef.current = cameraController; // Store in ref for global access
       cameraController.enableControls(renderer.domElement);
       cameraController.setZoomLimits(2, 20);
       cameraController.setTargetObjects(sun, earth);
@@ -203,6 +217,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
     return () => {
       window.removeEventListener('resize', handleResize);
       if (animationId) cancelAnimationFrame(animationId);
+      const cameraController = cameraControllerRef.current;
       if (cameraController) {
         cameraController.disableControls(renderer.domElement);
       }
@@ -213,6 +228,40 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
         backgroundElement.removeChild(renderer.domElement);
       }
     };
+  }, []);
+
+  useEffect(() => {
+    let lastLockedMeteor = null;
+    function pollLockedMeteor() {
+      const cameraController = cameraControllerRef.current;
+      if (cameraController) {
+        // Debug: print lockMode and lockedTarget
+        // eslint-disable-next-line
+        console.log('LockMode:', cameraController.lockMode, 'LockedTarget:', cameraController.lockedTarget);
+      }
+      if (cameraController && cameraController.lockMode === 'meteor' && cameraController.lockedTarget) {
+        let meteorName = '';
+        if (cameraController.lockedTarget.getName) {
+          meteorName = cameraController.lockedTarget.getName();
+        } else if (cameraController.lockedTarget.name) {
+          meteorName = cameraController.lockedTarget.name;
+        } else {
+          meteorName = 'Unknown';
+        }
+        // Debug: print meteor name
+        // eslint-disable-next-line
+        console.log('Locked Meteor Name:', meteorName);
+        if (meteorName !== lastLockedMeteor) {
+          setLockedMeteorName(meteorName);
+          lastLockedMeteor = meteorName;
+        }
+      } else if (lockedMeteorName !== '') {
+        setLockedMeteorName('');
+        lastLockedMeteor = null;
+      }
+      requestAnimationFrame(pollLockedMeteor);
+    }
+    pollLockedMeteor();
   }, []);
 
   return (
@@ -279,6 +328,27 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       }}>
         {bottomRight}
       </div>
+
+      {/* Meteor name overlay */}
+      {lockedMeteorName && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -120px)',
+          background: 'rgba(0,0,0,0.7)',
+          color: '#fff',
+          padding: '16px 32px',
+          borderRadius: '12px',
+          fontSize: '2rem',
+          fontWeight: 'bold',
+          zIndex: 100,
+          boxShadow: '0 2px 16px rgba(0,0,0,0.3)',
+          pointerEvents: 'none',
+        }}>
+          {lockedMeteorName}
+        </div>
+      )}
 
       {/* SpaceBodies-like nav arrows */}
       <Link to="/orbital-simulation-intro" className="sb-nav__btn left" aria-label="Back">‹</Link>
