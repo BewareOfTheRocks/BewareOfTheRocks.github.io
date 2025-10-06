@@ -34,12 +34,23 @@ jobs:
           cd frontend
           npm install
 
+      - name: Create environment file
+        run: |
+          cd frontend
+          echo "REACT_APP_CESIUM_API_KEY=${{ secrets.CESIUM_API_KEY }}" > .env
+
       - name: Build
         run: |
           cd frontend
           npm run build
         env:
           CI: false
+
+      - name: Replace Cesium API Key
+        run: |
+          find ./frontend/build -name "*.html" -type f -exec sed -i 's/CESIUM_API_KEY_PLACEHOLDER/${{ secrets.CESIUM_API_KEY }}/g' {} \;
+        env:
+          CESIUM_API_KEY: ${{ secrets.CESIUM_API_KEY }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
