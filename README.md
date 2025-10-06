@@ -4,7 +4,11 @@ Our project aims to create an engaging, interactive web application that allows 
 
 # Project Demonstration
 
+[Video Demonstration](https://www.youtube.com/watch?v=M-Bl2bmaYHg)
+
 # Project
+
+[BewareOfTheRocks](BewareOfTheRocks.github.io)
 
 # Project Details
 
