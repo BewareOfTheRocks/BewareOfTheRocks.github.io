@@ -25,7 +25,7 @@ export class Orbit {
         this.u = this.generateU(); // parametric angles for orbit
         this.orbitPoints = this.generateEllipsePoints(); // base ellipse points
         this.rotatedOrbits = this.applyRotations(); // rotated orbit points
-        console.log("Orbit initialized with parameters:", this);
+        //console.log("Orbit initialized with parameters:", this);
     }
 
     // Generate sequence like seq(-pi, pi, length.out=numPoints)
