@@ -49,6 +49,7 @@ export function createOrbitFromJPLData(jsonData) {
 
 // Function to parse a file with multiple JSON objects
 function parseOrbitFile(data) {
+    console.log('Starting to parse orbit file data');
     try {
         // Handle the data from require() or fetch()
         let jsonData = data;
@@ -73,7 +74,7 @@ function parseOrbitFile(data) {
         const orbitParamsArray = jsonData.map((asteroidData, index) => {
             try {
                 const orbitParams = createOrbitFromJPLData(asteroidData);
-                console.log(`Parsed asteroid ${index + 1}/${jsonData.length}: ${orbitParams.name}`);
+                //console.log(`Parsed asteroid ${index + 1}/${jsonData.length}: ${orbitParams.name}`);
                 return orbitParams;
             } catch (error) {
                 console.error(`Error parsing asteroid at index ${index}:`, error, asteroidData);

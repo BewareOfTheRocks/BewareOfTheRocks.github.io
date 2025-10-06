@@ -196,6 +196,27 @@ export class CameraController {
     
     // Update camera position
     update() {
+        // Defensive checks for spherical coordinates
+        if (
+            isNaN(this.spherical.radius) ||
+            isNaN(this.spherical.phi) ||
+            isNaN(this.spherical.theta) ||
+            !isFinite(this.spherical.radius) ||
+            !isFinite(this.spherical.phi) ||
+            !isFinite(this.spherical.theta)
+        ) {
+            console.error('CameraController: Invalid spherical coordinates detected, skipping camera update.', this.spherical);
+            return;
+        }
+        // Clamp phi to avoid flipping
+        this.spherical.phi = Math.max(0.01, Math.min(Math.PI - 0.01, this.spherical.phi));
+        // Clamp radius to min/max distance
+        this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius));
+        // Defensive check for target
+        if (!this.target || isNaN(this.target.x) || isNaN(this.target.y) || isNaN(this.target.z)) {
+            console.error('CameraController: Invalid target detected, skipping camera update.', this.target);
+            return;
+        }
         // Update target if locked onto an object (but not during transitions)
         if (this.lockedTarget && this.lockedTarget.getPosition && !this.isTransitioning) {
             this.target.copy(this.lockedTarget.getPosition());
