@@ -12,7 +12,8 @@ import musicManager from '../utils/MusicManager';
 import audioContextManager from '../utils/AudioContextManager';
 import '../styles/nav.css';
 
-export default function IntroSlide({ topLeft = 'First, calm down. There\'s no need to worry! For now, at least. Every year, several PHAs (Potentially Hazardous Asteroids) and NEOs (Near-Earth Objects) are detected by state-of-the-art technology.', bottomRight = 'Here on Earth, we like to be overly cautious. An asteroid or comet is considered "near" when it approaches our planet less than 1.3 times the distance from Earth to Sun. Thus, most of them aren\'t really a danger.' }) {
+export default function IntroSlide({ topLeft = 'First, calm down. There\'s no need to worry! For now, at least. Every year, several PHAs (Potentially Hazardous Asteroids) and NEOs (Near-Earth Objects) are detected by state-of-the-art technology.',
+   bottomRight = 'In this simulation you can visualize the real meteors that are travelling around Earth. These meteors you see were provided by Nasa telescopes, you can also see in perspective the size of the meteors and their trajectories.' }) {
   const backgroundRef = useRef(null);
 
   // Start music when component mounts
