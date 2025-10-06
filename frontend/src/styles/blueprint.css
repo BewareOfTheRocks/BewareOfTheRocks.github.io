@@ -121,7 +121,7 @@ font-size: clamp(2.2rem, 4vw, 5.0rem);
 }
 
 .blueprint__image {
-  width: 90%;
+  width: 100%;
   height: auto;
   border: 1.5px dashed rgba(207, 232, 255, 0.6);
   border-radius: 8px;
@@ -139,37 +139,28 @@ font-size: clamp(2.2rem, 4vw, 5.0rem);
 /* Blueprint page navigation arrows */
 .bp-nav__btn {
   position: fixed;
-  top: 50%;
+  top: 47%;
   transform: translateY(-50%);
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 1px solid rgba(207, 232, 255, 0.35);
-  background: rgba(0,0,0,0.25);
-  color: #cfe8ff;
-  font-size: 28px;
-  line-height: 1;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: #eaf2ff;
+  font-size: 26px;
   display: grid;
   place-items: center;
   cursor: pointer;
-  z-index: 4;
-  transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  z-index: 5;
 }
-.bp-nav__btn:hover {
-  background: rgba(255,255,255,0.12);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-}
-.bp-nav__btn:active {
-  transform: translateY(-50%) scale(0.98);
-}
-.bp-nav__btn.left { left: 16px; }
-.bp-nav__btn.right { right: 16px; }
+.bp-nav__btn.left { left: -21px; }
+.bp-nav__btn.right { right: -21px; }
 
 @media (max-width: 640px) {
-  .bp-nav__btn { width: 44px; height: 44px; font-size: 22px; }
-  .bp-nav__btn.left { left: 8px; }
-  .bp-nav__btn.right { right: 8px; }
- }
+  .bp-nav__btn { width: 42px; height: 42px; font-size: 22px; }
+  .bp-nav__btn.left { left: 16px; }
+  .bp-nav__btn.right { right: 16px; }
+}
 
 /* --- Slide enter/exit animations for blueprint paper --- */
 @keyframes bp-slide-in-left { from { transform: translateX(-110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
