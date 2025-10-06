@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ThreeDemo from './ThreeDemo';
 import Home from './components/Home';
 import TerminalLanding from './components/TerminalLanding';
@@ -14,6 +14,8 @@ import IntroSlide from './components/IntroSlide';
 import DraggableCards from './components/DraggableCards';
 import TypesOfSpaceBodiesSlide from './components/TypesOfSpaceBodiesSlide';
 import MitigationIntroSlide from './components/MitigationIntroSlide';
+import MeteorImpactSimulationIntroSlide from './components/MeteorImpactSimulationIntroSlide';
+import OrbitalSimulationIntroSlide from './components/OrbitalSimulationIntroSlide';
 
 export default function App() {
   return (
@@ -35,6 +37,9 @@ export default function App() {
         <Route path="/cards" element={<DraggableCards />} />
         <Route path="/meteor-impact-simulator" element={<MeteorImpactSimulator />} />
         <Route path="/ending" element={<TerminalLanding texts={['End of training. You are now fully prepared to protect planet Earth. Congratulations.\n\nClick to finish routine.']} path={'/credits'} />} />
+        <Route path="/meteor-impact-intro" element={<MeteorImpactSimulationIntroSlide />} />
+        <Route path="/orbital-simulation-intro" element={<OrbitalSimulationIntroSlide />} />
+
       </Routes>
     </BrowserRouter>
   );

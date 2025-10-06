@@ -128,22 +128,9 @@ export default function BlueprintPage({ wallpaperUrl }) {
   const randomDir = () => dirs[Math.floor(Math.random() * dirs.length)];
   const translate = (m) => `translate3d(${offset.x * m}px, ${offset.y * m}px, 0)`;
 
-  // Exit current overlay and then run an action (e.g., navigate away)
-  const exitAnd = (action) => {
-    if (animating) return;
-    setAnimating(true);
-    const exitDir = randomDir();
-    setAnimClass(`bp-animating bp-anim-exit-${exitDir}`);
-    setTimeout(() => {
-      action?.();
-      setAnimClass('');
-      setAnimating(false);
-    }, 330);
-  };
-
   const onPrev = () => {
     if (animating) return;
-    if (index === 0) return navigate('/meteor-impact-simulator?from=more-data');
+    if (index === 0) return navigate('/mitigation');
     const prevIdx = Math.max(0, index - 1);
     // Prepare overlay with previous content and slide it in on top
     setOverlayIndex(prevIdx);

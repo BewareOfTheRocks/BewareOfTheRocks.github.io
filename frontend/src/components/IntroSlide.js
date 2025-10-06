@@ -7,7 +7,6 @@ import { Galaxy } from '../render/Galaxy';
 import { CameraController } from '../controller/CameraController';
 import { Sun } from '../render/Sun';
 import { Meteor } from '../render/Meteor';
-import { ThreeInitializer } from '../utils/ThreeInitializer';
 import { parseOrbitFile } from '../utils/NasaJsonParser.js';
 import musicManager from '../utils/MusicManager';
 import audioContextManager from '../utils/AudioContextManager';
@@ -271,7 +270,7 @@ export default function IntroSlide({ topLeft = 'First, calm down. There\'s no ne
       </div>
 
       {/* SpaceBodies-like nav arrows */}
-      <Link to="/home" className="sb-nav__btn left" aria-label="Back">‹</Link>
+      <Link to="/orbital-simulation-intro" className="sb-nav__btn left" aria-label="Back">‹</Link>
       <Link to="/types-of-space-bodies" className="sb-nav__btn right" aria-label="Next">›</Link>
     </div>
   );

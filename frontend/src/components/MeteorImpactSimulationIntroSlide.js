@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/nav.css';
 
-export default function MitigationIntroSlide() {
+export default function MeteorImpactSimulationIntroSlide() {
   return (
     <div style={{
       minHeight: '100vh',
@@ -30,7 +30,7 @@ export default function MitigationIntroSlide() {
           margin: 0,
           textShadow: '0 0 24px rgba(0, 255, 200, 0.15), 0 0 8px rgba(255,255,255,0.15)'
         }}>
-          How to mitigate those risks?
+          Meteor Impact Simulator
         </h1>
         <p style={{
           margin: 0,
@@ -39,13 +39,13 @@ export default function MitigationIntroSlide() {
           lineHeight: 1.6,
           textShadow: '0 0 10px rgba(0,0,0,0.35)'
         }}>
-          After understanding what could cause harm to planet Earth, what is already being done to prevent that from happening?
-        </p>
+          Now that you have a better understanding of the potential effects of a meteor impact, you can use the Meteor Impact Simulator to explore different scenarios. Adjust parameters such as the size, speed, and angle of the meteor to see how these factors influence the impact's consequences on Earth.
+          </p>
       </div>
 
       {/* Nav arrows consistent with other slides */}
-      <Link to="/meteor-impact-simulator" className="sb-nav__btn left" aria-label="Back">‹</Link>
-      <Link to="/blueprint" className="sb-nav__btn right" aria-label="Next">›</Link>
+      <Link to="/more-data" className="sb-nav__btn left" aria-label="Back">‹</Link>
+      <Link to="/meteor-impact-simulator" className="sb-nav__btn right" aria-label="Next">›</Link>
     </div>
   );
 }

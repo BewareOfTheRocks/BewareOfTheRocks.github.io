@@ -24,7 +24,6 @@ export default function DraggableCards() {
   ));
   const dragRef = useRef({ activeId: null, dx: 0, dy: 0, baseX: 0, baseY: 0 });
 
-  const maxZ = useMemo(() => Math.max(...cards.map(c => c.z || 1), 1), [cards]);
   const [insideCards, setInsideCards] = useState([]);
 
   const computeInside = (list) => {

@@ -7,7 +7,7 @@ import musicManager from '../utils/MusicManager';
 
 export default function TerminalLanding() {
   const defaultTexts = [
-    `Attention, citizens! A colossal meteor is on a collision course with Earth!\nEveryone must immediately seek shelter in bunkers or underground safe locations!\nThe government is mobilizing unprecedented technology to try to stop the catastrophe,\nbut every second counts — you can help us in this mission!\n\nClick to continue...`,
+    `Attention, citizens! A colossal meteor Impactor is on a collision course with Earth!\nEveryone must immediately seek shelter in bunkers or underground safe locations!\nThe government is mobilizing unprecedented technology to try to stop the catastrophe,\nbut every second counts — you can help us in this mission!\n\nClick to continue...`,
     `Information will be your best ally.\nBefore taking action, you must endure a serious training on space objects.\nCan you help us?\n\nClick to start experience!`
   ];
   const texts = Array.isArray(arguments[0]?.texts) ? arguments[0].texts : defaultTexts;

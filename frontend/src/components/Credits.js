@@ -26,11 +26,11 @@ export default function Credits() {
     {
       key: 'thanks',
       title: 'Thank you!',
-      body: `Thank you for experiencing our space adventure.\n\nThis project was submitted on NASA Space Apps Challenge 2025, under the challenge Meteor Madness.\n\nIt has come to reality by the skills and dreams of UNICAMP undergraduate students\n Ainaras Marão\n Bruno Jambeiro\n Matheus Veiga\n Rafael Carro\n Nicholas Pucharelli\n Yan Oliveira`,
+      body: `Thank you for experiencing our space adventure.\n\nThis project was submitted on NASA Space Apps Challenge 2025, under the challenge Meteor Madness.\n\nIt has come to reality by the skills and dreams of UNICAMP undergraduate students\n Ainaras Marão\n Bruno Jambeiro\n Matheus Veiga\n Nicholas Pucharelli\n Rafael Carro\n Yan Oliveira`,
     }
   ];
 
-  const [index, setIndex] = useState(0);
+  const [index] = useState(0);
   const [anim, setAnim] = useState('in');
   // right column will contain a video element instead of a Three.js canvas
   const videoRef = useRef(null);
@@ -45,9 +45,6 @@ export default function Credits() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
 
-
-  const prev = () => setIndex((i) => Math.max(0, i - 1));
-  const next = () => setIndex((i) => Math.min(pages.length - 1, i + 1));
 
   return (
     <div className="credits__root">
