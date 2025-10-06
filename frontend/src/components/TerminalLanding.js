@@ -66,6 +66,33 @@ export default function TerminalLanding() {
     };
   }, []);
 
+  // Helper function to create meteor geometry with procedural deformation
+  const createMeteorGeometry = (radius, segments) => {
+    const geometry = new THREE.SphereGeometry(radius, segments, segments);
+    const position = geometry.attributes.position;
+    const vertex = new THREE.Vector3();
+    const seed = Math.random() * 1000;
+    
+    for (let i = 0; i < position.count; i++) {
+      vertex.fromBufferAttribute(position, i);
+      const direction = vertex.clone().normalize();
+      
+      const noise1 = simpleNoise(direction.x * 3 + seed, direction.y * 3 + seed, direction.z * 3 + seed);
+      const noise2 = simpleNoise(direction.x * 8 + seed, direction.y * 8 + seed, direction.z * 8 + seed);
+      const noise3 = simpleNoise(direction.x * 15 + seed, direction.y * 15 + seed, direction.z * 15 + seed);
+      
+      const deformation = noise1 * 0.3 + noise2 * 0.15 + noise3 * 0.08;
+      const newRadius = radius * (0.85 + deformation * 0.3);
+      vertex.multiplyScalar(newRadius / vertex.length());
+      
+      position.setXYZ(i, vertex.x, vertex.y, vertex.z);
+    }
+    
+    geometry.computeVertexNormals();
+    return geometry;
+  };
+
+
   // Preload Three.js assets, preprocessed objects, and initialize scene
   useEffect(() => {
     const loadingManager = new THREE.LoadingManager();
@@ -369,31 +396,7 @@ export default function TerminalLanding() {
     return displayedText;
   };
 
-  // Helper function to create meteor geometry with procedural deformation
-  const createMeteorGeometry = (radius, segments) => {
-    const geometry = new THREE.SphereGeometry(radius, segments, segments);
-    const position = geometry.attributes.position;
-    const vertex = new THREE.Vector3();
-    const seed = Math.random() * 1000;
-    
-    for (let i = 0; i < position.count; i++) {
-      vertex.fromBufferAttribute(position, i);
-      const direction = vertex.clone().normalize();
-      
-      const noise1 = simpleNoise(direction.x * 3 + seed, direction.y * 3 + seed, direction.z * 3 + seed);
-      const noise2 = simpleNoise(direction.x * 8 + seed, direction.y * 8 + seed, direction.z * 8 + seed);
-      const noise3 = simpleNoise(direction.x * 15 + seed, direction.y * 15 + seed, direction.z * 15 + seed);
-      
-      const deformation = noise1 * 0.3 + noise2 * 0.15 + noise3 * 0.08;
-      const newRadius = radius * (0.85 + deformation * 0.3);
-      vertex.multiplyScalar(newRadius / vertex.length());
-      
-      position.setXYZ(i, vertex.x, vertex.y, vertex.z);
-    }
-    
-    geometry.computeVertexNormals();
-    return geometry;
-  };
+  
 
   // Simple noise function
   const simpleNoise = (x, y, z) => {
