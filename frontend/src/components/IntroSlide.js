@@ -11,8 +11,8 @@ import musicManager from '../utils/MusicManager';
 import audioContextManager from '../utils/AudioContextManager';
 import '../styles/nav.css';
 
-export default function IntroSlide({ topLeft = 'First, calm down. There\'s no need to worry! For now, at least. Every year, several PHAs (Potentially Hazardous Asteroids) and NEOs (Near-Earth Objects) are detected by state-of-the-art technology.',
-   bottomRight = 'In this simulation you can visualize the real meteors that are travelling around Earth. These meteors you see were provided by Nasa Near-Earth Comets. Press A to lock in an Asteroid and use your left and right arrow to move around' }) {
+export default function IntroSlide({ topLeft = 'First, calm down. There\'s no need to worry! For now, at least. Every year, several PHAs (Potentially Hazardous Asteroids) and NEOs (Near-Earth Objects) are detected by state-of-the-art technology.(Wait a Little bit for the simulation  to load)',
+   bottomRight = 'In this simulation, you can explore real meteors currently orbiting around Earth. The data for these meteors comes from NASA\'s Near-Earth Comets program. Press \'A\' to lock onto an asteroid, and use the left and right arrow keys to move around.' }) {
   const backgroundRef = useRef(null);
   const [lockedMeteorName, setLockedMeteorName] = useState('');
   const cameraControllerRef = useRef(null);
