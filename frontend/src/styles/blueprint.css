@@ -251,3 +251,34 @@ font-size: clamp(2.2rem, 4vw, 5.0rem);
   position: relative;
   z-index: 1;
 }
+
+/* Page-level fade when navigating away from the last blueprint page */
+.blueprint.page-exit {
+  /* element content slightly scales and fades while a black overlay fades in */
+  animation: bp-page-fade-out 800ms cubic-bezier(.22,.9,.38,1) forwards;
+}
+
+@keyframes bp-page-fade-out {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.985); }
+}
+
+/* Black overlay that fades in to cover the background wallpaper */
+.blueprint.page-exit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  animation: bp-overlay-fade-in 800ms cubic-bezier(.22,.9,.38,1) forwards;
+}
+
+@keyframes bp-overlay-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Make navigation buttons non-interactive and fade during page exit */
+.blueprint.page-exit .bp-nav__btn { pointer-events: none; opacity: 0.0; transition: opacity 360ms linear; }

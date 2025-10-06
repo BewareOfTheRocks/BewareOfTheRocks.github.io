@@ -3,6 +3,7 @@
 .credits__left { padding: clamp(16px, 4vw, 36px); display: flex; flex-direction: column; justify-content: center; }
 .credits__right { position: relative; }
 .credits__right > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.credits__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .credits__title { margin: 0 0 clamp(20px, 5vw, 40px); font-size: clamp(32px, 7vw, 54px); font-weight: 800; }
 .credits__body { white-space: pre-wrap; margin: 0; font-size: clamp(18px, 3vw, 24px); line-height: 1.6; color: #e8f0ff; }
