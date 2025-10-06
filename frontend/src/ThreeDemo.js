@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import { Earth } from './render/Earth';
 import { Galaxy } from './render/Galaxy';
@@ -14,6 +14,7 @@ import { createOrbitFromJPLData, parseOrbitFile} from './utils/NasaJsonParser.js
 
 function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
     const location = useLocation();
+    const navigate = useNavigate();
     const mountRef = useRef(null);
     const statsContainerRef = useRef(null);
     const meteorsListRef = useRef([]); // Use ref for meteors list to access in animation loops
@@ -358,6 +359,21 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
         }
     }, [loadMeteors, asteroidOrbits, sceneReady, currentScene, sunInstance, currentCamera]);
 
+    // Function to handle back navigation
+    const handleBackNavigation = () => {
+        // Check where we came from
+        const fromState = location.state?.from;
+        const referrer = document.referrer;
+        
+        // If we came from home or no specific route, go to home
+        if (fromState === 'home' || referrer.includes('/home') || !fromState) {
+            navigate('/home');
+        } else {
+            // Go back to previous page or fallback to home
+            navigate(-1);
+        }
+    };
+
     return (
         <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
             <div style={{
@@ -388,14 +404,19 @@ function ThreeDemo({ loadMeteors: propLoadMeteors = true }) {
                 )}
                 <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>⌨️ ESC: Unlock camera</p>
                 <p style={{ margin: '0 0 10px 0', fontSize: '12px' }}>⌨️ ↑↓: Zoom</p>
-                <a href="/" style={{
-                    color: '#61dafb',
-                    textDecoration: 'none',
-                    fontWeight: 'bold',
-                    border: '1px solid #61dafb',
-                    padding: '5px 10px',
-                    borderRadius: '4px'
-                }}>← Back to Home</a>
+                <button 
+                    onClick={handleBackNavigation}
+                    style={{
+                        color: '#61dafb',
+                        backgroundColor: 'transparent',
+                        border: '1px solid #61dafb',
+                        padding: '5px 10px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '12px'
+                    }}
+                >← Back to Home</button>
             </div>
             <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
             <div ref={statsContainerRef} style={{ position: 'absolute', top: 0, left: 0, zIndex: 200 }} />
