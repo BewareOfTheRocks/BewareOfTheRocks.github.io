@@ -103,7 +103,7 @@ export default function Home() {
                 <div className="home-divider"><span>Highly recommended</span></div>
                 {/* Primary action on its own row */}
                 <div className="primary-action">
-                  <Link to="/intro" className="main-action-btn" onClick={(e) => { e.preventDefault(); startWarpTransition('/intro'); }}>TRAINING COURSE</Link>
+                  <Link to="/orbital-simulation-intro" className="main-action-btn" >TRAINING COURSE</Link>
                 </div>
 
                 {/* Divider with centered label */}

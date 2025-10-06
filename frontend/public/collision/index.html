@@ -556,7 +556,7 @@
             
             const referrer = document.referrer;
             
-            let returnUrl = '/more-data'; // Default fallback
+            let returnUrl = '/meteor-impact-intro'; // Default fallback
             
             console.log('Navigation debug:', {
                 fromParam,
@@ -569,20 +569,20 @@
             // Priority 1: Check URL parameter (current window)
             if (fromParam === 'home') {
                 returnUrl = '/home';
-            } else if (fromParam === 'more-data') {
-                returnUrl = '/more-data';
+            } else if (fromParam === 'meteor-impact-intro') {
+                returnUrl = '/meteor-impact-intro';
             }
             // Priority 2: Check parent window URL parameter (iframe case)
             else if (parentFromParam === 'home') {
                 returnUrl = '/home';
-            } else if (parentFromParam === 'more-data') {
-                returnUrl = '/more-data';
+            } else if (parentFromParam === 'meteor-impact-intro') {
+                returnUrl = '/meteor-impact-intro';
             }
             // Priority 3: Check referrer if no URL parameter
             else if (referrer.includes('/home')) {
                 returnUrl = '/home';
-            } else if (referrer.includes('/more-data')) {
-                returnUrl = '/more-data';
+            } else if (referrer.includes('/meteor-impact-intro')) {
+                returnUrl = '/meteor-impact-intro';
             }
             
             console.log(`Returning to: ${returnUrl} (from: ${fromParam || parentFromParam || 'referrer'}, referrer: ${referrer})`);
@@ -624,7 +624,7 @@
             
             const referrer = document.referrer;
             
-            let nextUrl = '/blueprint'; // Default
+            let nextUrl = '/mitigation'; // Default
                         
             console.log(`Going to next: ${nextUrl} (from: ${fromParam || parentFromParam || 'referrer'})`);
             

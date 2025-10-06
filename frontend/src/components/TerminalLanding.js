@@ -7,7 +7,7 @@ import musicManager from '../utils/MusicManager';
 
 export default function TerminalLanding() {
   const defaultTexts = [
-    `Attention, citizens! A colossal meteor is on a collision course with Earth!\nEveryone must immediately seek shelter in bunkers or underground safe locations!\nThe government is mobilizing unprecedented technology to try to stop the catastrophe,\nbut every second counts — you can help us in this mission!\n\nClick to continue...`,
+    `Attention, citizens! A colossal meteor Impactor is on a collision course with Earth!\nEveryone must immediately seek shelter in bunkers or underground safe locations!\nThe government is mobilizing unprecedented technology to try to stop the catastrophe,\nbut every second counts — you can help us in this mission!\n\nClick to continue...`,
     `Information will be your best ally.\nBefore taking action, you must endure a serious training on space objects.\nCan you help us?\n\nClick to start experience!`
   ];
   const texts = Array.isArray(arguments[0]?.texts) ? arguments[0].texts : defaultTexts;
@@ -19,13 +19,13 @@ export default function TerminalLanding() {
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
   const [canClick, setCanClick] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [preloadedAssets, setPreloadedAssets] = useState({});
+  // const [loadingProgress, setLoadingProgress] = useState(0);
+  // const [preloadedAssets, setPreloadedAssets] = useState({});
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [terminalSound, setTerminalSound] = useState(null);
   const navigate = useNavigate();
 
-  const fullText = currentText;
+  // const fullText = currentText;
 
   // Initialize audio context manager
   useEffect(() => {
@@ -66,6 +66,33 @@ export default function TerminalLanding() {
     };
   }, []);
 
+  // Helper function to create meteor geometry with procedural deformation
+  const createMeteorGeometry = (radius, segments) => {
+    const geometry = new THREE.SphereGeometry(radius, segments, segments);
+    const position = geometry.attributes.position;
+    const vertex = new THREE.Vector3();
+    const seed = Math.random() * 1000;
+    
+    for (let i = 0; i < position.count; i++) {
+      vertex.fromBufferAttribute(position, i);
+      const direction = vertex.clone().normalize();
+      
+      const noise1 = simpleNoise(direction.x * 3 + seed, direction.y * 3 + seed, direction.z * 3 + seed);
+      const noise2 = simpleNoise(direction.x * 8 + seed, direction.y * 8 + seed, direction.z * 8 + seed);
+      const noise3 = simpleNoise(direction.x * 15 + seed, direction.y * 15 + seed, direction.z * 15 + seed);
+      
+      const deformation = noise1 * 0.3 + noise2 * 0.15 + noise3 * 0.08;
+      const newRadius = radius * (0.85 + deformation * 0.3);
+      vertex.multiplyScalar(newRadius / vertex.length());
+      
+      position.setXYZ(i, vertex.x, vertex.y, vertex.z);
+    }
+    
+    geometry.computeVertexNormals();
+    return geometry;
+  };
+
+
   // Preload Three.js assets, preprocessed objects, and initialize scene
   useEffect(() => {
     const loadingManager = new THREE.LoadingManager();
@@ -91,7 +118,7 @@ export default function TerminalLanding() {
       loadedItems++;
       const progress = (loadedItems / totalItems) * 100;
       console.log(`Loading progress: ${progress}% (${loadedItems}/${totalItems})`);
-      setLoadingProgress(progress);
+      // setLoadingProgress(progress);
     };
 
     loadingManager.onLoad = () => {
@@ -161,7 +188,7 @@ export default function TerminalLanding() {
               updateProgress(); // Continue even if background init fails
             });
           
-          setPreloadedAssets(loadedAssets);
+          // setPreloadedAssets(loadedAssets);
           setAssetsLoaded(true);
           
           // Store everything globally
@@ -211,7 +238,7 @@ export default function TerminalLanding() {
         if (material.dispose) material.dispose();
       });
     };
-  }, []);
+  }, [createMeteorGeometry]);
 
   // Terminal typing effect
   useEffect(() => {
@@ -369,31 +396,7 @@ export default function TerminalLanding() {
     return displayedText;
   };
 
-  // Helper function to create meteor geometry with procedural deformation
-  const createMeteorGeometry = (radius, segments) => {
-    const geometry = new THREE.SphereGeometry(radius, segments, segments);
-    const position = geometry.attributes.position;
-    const vertex = new THREE.Vector3();
-    const seed = Math.random() * 1000;
-    
-    for (let i = 0; i < position.count; i++) {
-      vertex.fromBufferAttribute(position, i);
-      const direction = vertex.clone().normalize();
-      
-      const noise1 = simpleNoise(direction.x * 3 + seed, direction.y * 3 + seed, direction.z * 3 + seed);
-      const noise2 = simpleNoise(direction.x * 8 + seed, direction.y * 8 + seed, direction.z * 8 + seed);
-      const noise3 = simpleNoise(direction.x * 15 + seed, direction.y * 15 + seed, direction.z * 15 + seed);
-      
-      const deformation = noise1 * 0.3 + noise2 * 0.15 + noise3 * 0.08;
-      const newRadius = radius * (0.85 + deformation * 0.3);
-      vertex.multiplyScalar(newRadius / vertex.length());
-      
-      position.setXYZ(i, vertex.x, vertex.y, vertex.z);
-    }
-    
-    geometry.computeVertexNormals();
-    return geometry;
-  };
+  
 
   // Simple noise function
   const simpleNoise = (x, y, z) => {

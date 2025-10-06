@@ -72,6 +72,9 @@ export default function BlueprintPage({ wallpaperUrl }) {
   const [overlayIndex, setOverlayIndex] = React.useState(0);
   const [animClass, setAnimClass] = React.useState(''); // applied to overlay paper
   const [animating, setAnimating] = React.useState(false);
+  // Page-level exit state used to fade the entire blueprint before navigation
+  const [pageExit, setPageExit] = React.useState(false);
+  const pageExitRef = React.useRef(null);
 
   // Keep stack in sync when index changes programmatically
   React.useEffect(() => {
@@ -102,6 +105,13 @@ export default function BlueprintPage({ wallpaperUrl }) {
     };
   }, []);
 
+  // Clear any pending page exit timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (pageExitRef.current) clearTimeout(pageExitRef.current);
+    };
+  }, []);
+
   const pageFor = (i) => SUBPAGES[i] || SUBPAGES[0];
   const paragraphsFor = (p) => {
     const t = p.text;
@@ -118,22 +128,9 @@ export default function BlueprintPage({ wallpaperUrl }) {
   const randomDir = () => dirs[Math.floor(Math.random() * dirs.length)];
   const translate = (m) => `translate3d(${offset.x * m}px, ${offset.y * m}px, 0)`;
 
-  // Exit current overlay and then run an action (e.g., navigate away)
-  const exitAnd = (action) => {
-    if (animating) return;
-    setAnimating(true);
-    const exitDir = randomDir();
-    setAnimClass(`bp-animating bp-anim-exit-${exitDir}`);
-    setTimeout(() => {
-      action?.();
-      setAnimClass('');
-      setAnimating(false);
-    }, 330);
-  };
-
   const onPrev = () => {
     if (animating) return;
-    if (index === 0) return navigate('/meteor-impact-simulator?from=more-data');
+    if (index === 0) return navigate('/mitigation');
     const prevIdx = Math.max(0, index - 1);
     // Prepare overlay with previous content and slide it in on top
     setOverlayIndex(prevIdx);
@@ -149,7 +146,16 @@ export default function BlueprintPage({ wallpaperUrl }) {
   };
   const onNext = () => {
     if (animating) return;
-    if (index === SUBPAGES.length - 1) return navigate('/ending');
+    // If we're on the last page, play a page-level fade-out then navigate
+    if (index === SUBPAGES.length - 1) {
+      setAnimating(true);
+      setPageExit(true);
+      // match CSS animation duration (800ms) with small buffer
+      pageExitRef.current = setTimeout(() => {
+        navigate('/ending');
+      }, 820);
+      return;
+    }
     const nextIdx = Math.min(SUBPAGES.length - 1, index + 1);
     // Prepare base with next content and slide current out to reveal it
     setBaseIndex(nextIdx);
@@ -165,7 +171,7 @@ export default function BlueprintPage({ wallpaperUrl }) {
   };
 
   return (
-    <section className="blueprint space-blueprint-container" style={{ '--bp-wallpaper': `url(${wallpaper})` }} onMouseMove={handleMouseMove}>
+    <section className={`blueprint space-blueprint-container${pageExit ? ' page-exit' : ''}`} style={{ '--bp-wallpaper': `url(${wallpaper})` }} onMouseMove={handleMouseMove}>
       {/* Background layers with parallax */}
       <div className="background-layer" style={{ transform: translate(1.5) }}>
         <div className="stars-layer"><StarField count={120} /></div>

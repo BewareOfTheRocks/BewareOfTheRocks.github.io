@@ -53,7 +53,9 @@ export default function SpaceBodiesSlides() {
     if (colonIdx > -1) {
       return { title: str.slice(0, colonIdx).trim(), body: str.slice(colonIdx + 1).trim() };
     }
-    const m = /^(meteoroid|meteoroids|meteor|meteors|meteorite|meteorites)\b[:\-]?\s*(.*)$/i.exec(str);
+
+    const m = /^(meteoroid|meteoroids|meteor|meteors|meteorite|meteorites)\b[:-]?\s*(.*)$/i.exec(str);
+
     if (m) {
       const raw = m[1];
       const singular = raw.toLowerCase().endsWith('s') ? raw.slice(0, -1) : raw;
@@ -132,9 +134,9 @@ export default function SpaceBodiesSlides() {
     const animate = () => {
       rafRef.current = requestAnimationFrame(animate);
       // Rotate only the active object - get current index from state
-      const currentIndex = meteorsRef.current.findIndex((m, i) => {
-        return m.mesh && m.mesh.visible;
-      });
+      // const currentIndex = meteorsRef.current.findIndex((m, i) => {
+      //   return m.mesh && m.mesh.visible;
+      // });
       
       meteorsRef.current.forEach((m, i) => { 
         if (m.mesh && m.mesh.visible) { // Check if this object is currently visible

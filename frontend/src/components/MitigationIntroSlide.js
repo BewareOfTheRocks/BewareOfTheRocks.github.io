@@ -44,7 +44,7 @@ export default function MitigationIntroSlide() {
       </div>
 
       {/* Nav arrows consistent with other slides */}
-      <Link to="/more-data" className="sb-nav__btn left" aria-label="Back">‹</Link>
+      <Link to="/meteor-impact-simulator" className="sb-nav__btn left" aria-label="Back">‹</Link>
       <Link to="/blueprint" className="sb-nav__btn right" aria-label="Next">›</Link>
     </div>
   );
